@@ -101,7 +101,7 @@ final class DPadView extends View {
         okFill.setColor(zone == CENTER ? Ui.ACCENT : 0xFF2D5BBA);
         canvas.drawCircle(cx, cy, ir * 0.92f, okFill);
         float baseline = cy - (okText.descent() + okText.ascent()) / 2f;
-        canvas.drawText("OK", cx, baseline, okText);
+        canvas.drawText("נודר", cx, baseline, okText);
     }
 
     private void chevron(Canvas c, float x, float y, int dir, float s) {

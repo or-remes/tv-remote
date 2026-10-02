@@ -449,7 +449,7 @@ public class MainActivity extends Activity {
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
         statusView.setLayoutParams(statusLp);
 
-        Button settings = pill("הגדרות", Ui.MUTED, Ui.STROKE);
+        Button settings = pill("לא לגעת", Ui.MUTED, Ui.STROKE);
         settings.setTextSize(12);
         LinearLayout.LayoutParams settingsLp = new LinearLayout.LayoutParams(dp(78), dp(34));
         settingsLp.setMargins(dp(8), 0, 0, 0);
@@ -510,11 +510,11 @@ public class MainActivity extends Activity {
         pad.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
         pad.setPadding(0, dp(12), 0, 0);
 
-        Button power = pill("כיבוי", Ui.DANGER, Ui.DANGER);
+        Button power = pill("חלאס", Ui.DANGER, Ui.DANGER);
         power.setOnClickListener(keyClick(Keys.POWER));
-        Button home = pill("בית", Ui.TEXT, Ui.STROKE);
+        Button home = pill("הבית", Ui.TEXT, Ui.STROKE);
         home.setOnClickListener(keyClick(Keys.HOME));
-        Button back = pill("חזרה", Ui.TEXT, Ui.STROKE);
+        Button back = pill("התחרטתי", Ui.TEXT, Ui.STROKE);
         back.setOnClickListener(keyClick(Keys.BACK));
         pad.addView(row(power, home, back));
 
@@ -526,13 +526,13 @@ public class MainActivity extends Activity {
         pad.addView(dpad, dpadLp);
 
         // volume rocker, mute, channel rocker
-        RockerView volume = new RockerView(this, "ווליום", false,
+        RockerView volume = new RockerView(this, "תן בראש", false,
                 Keys.VOLUME_UP, Keys.VOLUME_DOWN, true, keyCallback);
-        RockerView channels = new RockerView(this, "ערוץ", true,
+        RockerView channels = new RockerView(this, "מה רואים?", true,
                 Keys.CHANNEL_UP, Keys.CHANNEL_DOWN, false, keyCallback);
-        Button mute = pill("השתקה", Ui.TEXT, Ui.STROKE);
+        Button mute = pill("עכשיו דממה", Ui.TEXT, Ui.STROKE);
         mute.setOnClickListener(keyClick(Keys.VOLUME_MUTE));
-        mute.setLayoutParams(new LinearLayout.LayoutParams(dp(92), dp(42)));
+        mute.setLayoutParams(new LinearLayout.LayoutParams(dp(108), dp(42)));
 
         LinearLayout rockers = new LinearLayout(this);
         rockers.setOrientation(LinearLayout.HORIZONTAL);
@@ -553,11 +553,11 @@ public class MainActivity extends Activity {
                 media(IconButton.STOP, Keys.MEDIA_STOP),
                 media(IconButton.FF, Keys.MEDIA_FAST_FORWARD)));
 
-        SpannableString recordText = new SpannableString("●  הקלטת תוכנית");
+        SpannableString recordText = new SpannableString("●  למחוק אחר כך");
         recordText.setSpan(new ForegroundColorSpan(Ui.DANGER), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         Button record = pill(recordText, Ui.TEXT, Ui.STROKE);
         record.setOnClickListener(keyClick(Keys.MEDIA_RECORD));
-        Button recordings = pill("הקלטות", Ui.TEXT, Ui.STROKE);
+        Button recordings = pill("אין לי זמן לראות", Ui.TEXT, Ui.STROKE);
         recordings.setOnClickListener(keyClick(Keys.DVR));
         pad.addView(row(record, recordings));
 
