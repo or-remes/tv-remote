@@ -164,14 +164,23 @@ public final class RemoteClient implements Closeable {
     }
 
     private void closeQuietly() {
-        SSLSocket s = socket;
-        if (s != null) {
-            try {
-                s.close();
-            } catch (IOException ignored) {
-                // already closed
-            }
+        final SSLSocket s = socket;
+        if (s == null) {
+            return;
         }
+        // Closing a TLS socket sends a goodbye message, which Android forbids on the UI
+        // thread (it crashes the app), so always do it on a helper thread.
+        Thread t = new Thread(new Runnable() {
+            @Override public void run() {
+                try {
+                    s.close();
+                } catch (Exception ignored) {
+                    // already closed
+                }
+            }
+        }, "socket-close");
+        t.setDaemon(true);
+        t.start();
     }
 
     @Override

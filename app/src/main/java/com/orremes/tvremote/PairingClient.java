@@ -134,12 +134,21 @@ public final class PairingClient implements Closeable {
 
     @Override
     public void close() {
-        if (socket != null) {
-            try {
-                socket.close();
-            } catch (IOException ignored) {
-                // already closed
-            }
+        final SSLSocket s = socket;
+        if (s == null) {
+            return;
         }
+        // Closing a TLS socket must not happen on the UI thread on Android.
+        Thread t = new Thread(new Runnable() {
+            @Override public void run() {
+                try {
+                    s.close();
+                } catch (Exception ignored) {
+                    // already closed
+                }
+            }
+        }, "socket-close");
+        t.setDaemon(true);
+        t.start();
     }
 }

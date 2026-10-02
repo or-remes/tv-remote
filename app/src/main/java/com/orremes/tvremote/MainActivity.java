@@ -31,11 +31,10 @@ public class MainActivity extends Activity {
     private static final String PREFS = "tvremote";
     private static final int MAX_RETRIES = 5;
 
-    // Opening apps on the box. YouTube works with a web link; the other two are launched
-    // by package name through the Play Store launcher link.
+    // Opening apps on the box (the box opens the link with whichever app registered for it).
     private static final String LINK_YOUTUBE = "https://www.youtube.com";
-    private static final String LINK_NETFLIX = "market://launch?id=com.netflix.ninja";
-    private static final String LINK_SPOTIFY = "market://launch?id=com.spotify.tv.android";
+    private static final String LINK_NETFLIX = "https://www.netflix.com/title";
+    private static final String LINK_SPOTIFY = "spotify://";
 
     private final Handler ui = new Handler(Looper.getMainLooper());
     private SharedPreferences prefs;
@@ -75,7 +74,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        installCrashLogger();
         buildUi();
+        showLastCrash();
         try {
             identity = new Identity(getFilesDir());
         } catch (Exception e) {
@@ -122,6 +123,53 @@ public class MainActivity extends Activity {
         if (discovery != null) {
             discovery.stop();
         }
+    }
+
+    // ---------------------------------------------------------------- crash report
+
+    /** Saves the details of an unexpected crash so the next launch can show them. */
+    private void installCrashLogger() {
+        final java.io.File file = new java.io.File(getFilesDir(), "last_crash.txt");
+        final Thread.UncaughtExceptionHandler previous = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override public void uncaughtException(Thread thread, Throwable error) {
+                try {
+                    java.io.StringWriter text = new java.io.StringWriter();
+                    error.printStackTrace(new java.io.PrintWriter(text));
+                    java.io.FileOutputStream out = new java.io.FileOutputStream(file);
+                    out.write(("thread: " + thread.getName() + "\n" + text).getBytes("UTF-8"));
+                    out.close();
+                } catch (Throwable ignored) {
+                    // nothing else we can do while crashing
+                }
+                if (previous != null) {
+                    previous.uncaughtException(thread, error);
+                }
+            }
+        });
+    }
+
+    private void showLastCrash() {
+        final java.io.File file = new java.io.File(getFilesDir(), "last_crash.txt");
+        if (!file.exists()) {
+            return;
+        }
+        String details;
+        try {
+            java.io.FileInputStream in = new java.io.FileInputStream(file);
+            byte[] buf = new byte[(int) Math.min(file.length(), 1500)];
+            int n = in.read(buf);
+            in.close();
+            details = new String(buf, 0, Math.max(n, 0), "UTF-8");
+        } catch (Exception e) {
+            details = "(לא ניתן לקרוא את הפרטים)";
+        }
+        file.delete();
+        new AlertDialog.Builder(this)
+                .setTitle("האפליקציה קרסה בפעם הקודמת")
+                .setMessage("אפשר לצלם את המסך הזה ולשלוח לי:\n\n" + details)
+                .setPositiveButton("סגור", null)
+                .show();
     }
 
     // ---------------------------------------------------------------- connection
