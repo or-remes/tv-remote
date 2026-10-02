@@ -337,6 +337,44 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    private void probeTv() {
+        setStatus("בודק טלוויזיה... (עד חצי דקה)", false);
+        new Thread(new Runnable() {
+            @Override public void run() {
+                String text;
+                try {
+                    java.util.List<String> tvs = TvProbe.scan();
+                    if (tvs.isEmpty()) {
+                        text = "לא נמצאה אף טלוויזיה עם פורט 36669 פתוח ברשת.\nוודא שהטלוויזיה דולקת ושהטלפון על אותו ווי-פיי.";
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        for (String ip : tvs) {
+                            sb.append(TvProbe.run(ip, identity)).append("\n");
+                        }
+                        text = sb.toString();
+                    }
+                } catch (Throwable t) {
+                    text = "שגיאה: " + t;
+                }
+                final String shown = text;
+                runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        setStatus("הבדיקה הסתיימה", true);
+                        TextView tv = new TextView(MainActivity.this);
+                        tv.setText(shown);
+                        tv.setTextIsSelectable(true);
+                        tv.setPadding(dp(20), dp(12), dp(20), dp(12));
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("תוצאת בדיקה")
+                                .setView(tv)
+                                .setPositiveButton("סגור", null)
+                                .show();
+                    }
+                });
+            }
+        }).start();
+    }
+
     private void closeRemote() {
         ui.removeCallbacks(reconnectTask);
         if (remote != null) {
@@ -502,6 +540,13 @@ public class MainActivity extends Activity {
             }
         });
         settingsPanel.addView(row(search, connectBtn, pair));
+        Button probe = pill("בדיקת טלוויזיה", Ui.TEXT, Ui.STROKE);
+        probe.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                probeTv();
+            }
+        });
+        settingsPanel.addView(row(probe));
         col.addView(settingsPanel);
 
         // the remote: always left-to-right so the arrows point the right way
