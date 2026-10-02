@@ -120,6 +120,8 @@ public final class Identity {
     public SSLSocket connect(String host, int port, int timeoutMs) throws IOException {
         SSLSocket socket = (SSLSocket) sslContext.getSocketFactory().createSocket();
         try {
+            socket.setKeepAlive(true);
+            socket.setTcpNoDelay(true);
             socket.connect(new InetSocketAddress(host, port), timeoutMs);
             socket.setSoTimeout(timeoutMs);
             socket.startHandshake();
